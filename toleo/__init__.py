@@ -48,6 +48,7 @@ class Toleo():
         return cfg
 
     def scrape(self, url, use_headers=False):
+        ''' Scrape the content or headers of a website. '''
         if use_headers:
             headers = requests.head(url).headers
             result = json.dumps(dict(headers))
@@ -56,6 +57,7 @@ class Toleo():
         return result
 
     def ver_compare(self, a, b):
+        ''' Logically compare two versions. '''
         a_ver = pkg_resources.parse_version(a)
         b_ver = pkg_resources.parse_version(b)
         if a_ver == b_ver:
@@ -73,7 +75,7 @@ class Toleo():
         return data.json()
 
     def upstream_version(self, pkg_name):
-        ''' Scrape upstream site to find the highest version. '''
+        ''' Check the upstream site to find the latest version. '''
         upstream = self.cfg.get(pkg_name).get('upstream')
         url = upstream.get('url')
         parser = upstream.get('parser')
@@ -107,7 +109,6 @@ class Toleo():
         return version, release
 
 
-
 @click.command()
 @click.argument('action')
 @click.option('--debug/--no-debug', default=False)
@@ -115,7 +116,7 @@ class Toleo():
 @click.option('--path-override', envvar='TOLEO_CONFIG_HOME')
 @click.option('--limit', '-l')
 def cli(action, debug, collection, path_override, limit):
-    ''' entry point for application '''
+    ''' Entry point for application. '''
     app = Toleo(debug, collection, path_override, limit)
     if action == 'upstream':
         upstream(app)
@@ -125,21 +126,19 @@ def cli(action, debug, collection, path_override, limit):
         compare(app)
 
 def upstream(app):
-    ''' get version from upstream '''
+    ''' Get version from upstream. '''
     # INCOMPLETE
     for pkg_name in app.cfg:
         click.echo('package:\t{}'.format(pkg_name))
         pkg_version = app.upstream_version(pkg_name)
         click.echo('latest:\t\t{}\n'.format(pkg_version))
 
-
 def repo(app):
-    ''' get version and release from repo '''
+    ''' Get version and release from repo. '''
     click.echo('checking repo')
     # INCOMPLETE
 
-
 def compare(app):
-    ''' check if repo version is same as upstream version '''
+    ''' Check if repo version is same as upstream version. '''
     click.echo('comparing repo to upstream')
     # INCOMPLETE
