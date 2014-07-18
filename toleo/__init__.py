@@ -13,9 +13,9 @@ import pkg_resources # setuptools
 
 class Toleo():
 
-    def __init__(self, debug=False, collection='default',
+    def __init__(self, verbose, collection='default',
                  path_override=None, limit=None):
-        self.debug = debug
+        self.verbose = verbose
         self.collection = collection
         self.path_override = path_override
         self.limit = limit
@@ -91,12 +91,13 @@ class Toleo():
         use_headers = upstream.get('use_headers', False)
         result = self.scrape(url, use_headers)
         matches = re.findall(pattern, result)
-        if self.debug:
+        if self.verbose > 0:
             click.echo('url:\t\t{}'.format(url))
             click.echo('parser:\t\t{}'.format(parser))
             click.echo('use_headers:\t{}'.format(use_headers))
-            #click.echo('\nresult:\n{}'.format(result))
             click.echo('matches:\t{}'.format(matches))
+            if self.verbose > 1:
+                click.echo('result:\t{}'.format(result))
         version = ''
         for match in matches:
             if self.ver_compare(match, version, ignore_release=True) == 'gt':
@@ -118,13 +119,14 @@ class Toleo():
             result = self.scrape(url, use_headers)
             pattern = repo.get('pattern')
             matches = re.findall(pattern, result)
-            if self.debug:
+            if self.verbose > 0:
                 click.echo('url:\t\t{}'.format(url))
                 click.echo('parser:\t\t{}'.format(parser))
                 click.echo('use_headers:\t{}'.format(use_headers))
                 click.echo('pattern:\t{}'.format(pattern))
-                click.echo('\nresult:\n{}'.format(result))
                 click.echo('matches:\t{}'.format(matches))
+                if self.verbose > 1:
+                    click.echo('result:\t{}'.format(result))
             version = ''
             for match in matches:
                 if self.ver_compare(match, version) == 'gt':
@@ -166,13 +168,13 @@ class Toleo():
 @click.command()
 @click.option('--upstream-only', '-u', 'action', flag_value='upstream')
 @click.option('--repo-only', '-r', 'action', flag_value='repo')
-@click.option('--debug/--no-debug', default=False)
+@click.option('--verbose', '-v', count=True)
 @click.option('--collection', '-c', default='default')
 @click.option('--path-override', envvar='TOLEO_CONFIG_HOME')
 @click.option('--limit', '-l')
-def cli(action, debug, collection, path_override, limit):
+def cli(action, verbose, collection, path_override, limit):
     ''' Entry point for application. '''
-    app = Toleo(debug, collection, path_override, limit)
+    app = Toleo(verbose, collection, path_override, limit)
     if action == 'upstream':
         app.action_upstream()
     elif action == 'repo':
