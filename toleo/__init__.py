@@ -92,7 +92,8 @@ class Toleo():
         version = ''
         for match in matches:
             if self.ver_compare(match, version) == 'gt':
-                version = match
+                # use -0 release for consistentcy with repo versions
+                version = '{}-0'.format(match)
         return version
 
     def repo_version_release(self, pkg_name):
@@ -113,7 +114,7 @@ class Toleo():
         for pkg_name in self.cfg:
             click.echo('package:\t{}'.format(pkg_name))
             pkg_version = self.upstream_version(pkg_name)
-            click.echo('latest:\t\t{}\n'.format(pkg_version))
+            click.echo('latest:\t\t{}\n'.format(pkg_version.rstrip('-0')))
 
     def action_repo(self):
         ''' Print all repo versions and releases. '''
