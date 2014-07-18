@@ -60,8 +60,11 @@ class Toleo():
             result = requests.get(url).text
         return result
 
-    def ver_compare(self, a, b):
+    def ver_compare(self, a, b, ignore_release=False):
         ''' Logically compare two versions. '''
+        if ignore_release:
+            a = a.split('-')[0]
+            b = b.split('-')[0]
         a_ver = pkg_resources.parse_version(a)
         b_ver = pkg_resources.parse_version(b)
         if a_ver == b_ver:
@@ -96,9 +99,8 @@ class Toleo():
             click.echo('matches:\t{}'.format(matches))
         version = ''
         for match in matches:
-            if self.ver_compare(match, version) == 'gt':
-                # use -0 release for consistentcy with repo versions
-                version = '{}-0'.format(match)
+            if self.ver_compare(match, version, ignore_release=True) == 'gt':
+                version = match
         return version
 
     def repo_version(self, pkg_name):
