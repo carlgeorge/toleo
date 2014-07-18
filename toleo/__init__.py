@@ -23,6 +23,10 @@ class Toleo():
         self.cfg = self.read_config()
         self.line = '-' * 50
 
+    def abort(self, msg):
+        formatted_msg = click.style(msg, fg='red', bold=True)
+        sys.exit(formatted_msg)
+
     def find_config(self):
         ''' Return a pathlib object of the desired config file. '''
         dir_name = self.path_override or click.get_app_dir('toleo')
@@ -37,8 +41,7 @@ class Toleo():
                 full_cfg = yaml.load(f)
         else:
             msg = 'cannot read {}'.format(self.cfg_path)
-            formatted_msg = click.style(msg, fg='red', bold=True)
-            sys.exit(formatted_msg)
+            self.abort(msg)
         if self.limit is None:
             cfg = full_cfg
         else:
