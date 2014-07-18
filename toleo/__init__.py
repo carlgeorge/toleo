@@ -55,7 +55,7 @@ class Toleo():
             result = requests.get(url).text
         return result
 
-    def compare(self, a, b):
+    def ver_compare(self, a, b):
         a_ver = pkg_resources.parse_version(a)
         b_ver = pkg_resources.parse_version(b)
         if a_ver == b_ver:
@@ -89,7 +89,7 @@ class Toleo():
             click.echo('matches:\t{}'.format(matches))
         version = ''
         for match in matches:
-            if self.compare(match, version) == 'gt':
+            if self.ver_compare(match, version) == 'gt':
                 version = match
         return version
 
