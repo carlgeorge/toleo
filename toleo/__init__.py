@@ -10,31 +10,41 @@ import click
 import yaml
 import pkg_resources # setuptools
 
-app_name = 'toleo'
 
 class Toleo():
-    def __init__(self, collection='default', path_override=None):
+
+    def __init__(self, debug=False, collection='default',
+                 path_override=None, limit=None):
+        self.debug = debug
         self.collection = collection
         self.path_override = path_override
-        self.cfg_path = self.find_config(self.collection, self.path_override) 
-        self.cfg = self.read_config(self.cfg_path)
+        self.limit = limit
+        self.cfg_path = self.find_config()
+        self.cfg = self.read_config()
 
-    def find_config(self, collection, path_override):
+    def find_config(self):
         ''' Return a pathlib object of the desired config file. '''
-        dir_name = path_override or click.get_app_dir(app_name)
-        app_dir = pathlib.Path(dir_name)
-        app_cfg = ( app_dir / collection ).with_suffix('.yaml')
-        return app_cfg
+        dir_name = self.path_override or click.get_app_dir('toleo')
+        dir_path = pathlib.Path(dir_name)
+        cfg_path = ( dir_path / self.collection ).with_suffix('.yaml')
+        return cfg_path
 
-    def read_config(self, cfg_path):
+    def read_config(self):
         ''' Read config from pathlib object. '''
-        if cfg_path.is_file():
-            with cfg_path.open() as f:
-                cfg = yaml.load(f)
+        if self.cfg_path.is_file():
+            with self.cfg_path.open() as f:
+                full_cfg = yaml.load(f)
         else:
-            msg = 'cannot read {}'.format(cfg_path)
+            msg = 'cannot read {}'.format(self.cfg_path)
             formatted_msg = click.style(msg, fg='red', bold=True)
             sys.exit(formatted_msg)
+        if self.limit is None:
+            cfg = full_cfg
+        else:
+            cfg = {}
+            for key in full_cfg:
+                if self.limit in key:
+                    cfg[key] = full_cfg[key]
         return cfg
 
     def scrape(self, url, use_headers=False):
@@ -71,7 +81,13 @@ class Toleo():
         use_headers = upstream.get('use_headers')
         result = self.scrape(url, use_headers)
         matches = re.findall(pattern, result)
-        version = '0'
+        if self.debug:
+            click.echo('url:\t\t{}'.format(url))
+            click.echo('parser:\t\t{}'.format(parser))
+            click.echo('use_headers:\t{}'.format(use_headers))
+            #click.echo('\nresult:\n{}'.format(result))
+            click.echo('matches:\t{}'.format(matches))
+        version = ''
         for match in matches:
             if self.compare(match, version) == 'gt':
                 version = match
@@ -92,29 +108,38 @@ class Toleo():
 
 
 
-
 @click.group()
+@click.option('--debug/--no-debug', default=False)
 @click.option('--collection', '-c', default='default')
-def cli(collection):
+@click.option('--path-override', envvar='TOLEO_CONFIG_HOME')
+@click.option('--limit', '-l')
+@click.pass_context
+def cli(ctx, debug, collection, path_override, limit):
     ''' entry point for application '''
-    pass
+    ctx.obj = Toleo(debug, collection, path_override, limit)
 
 @cli.command()
-def upstream():
+@click.pass_obj
+def upstream(toleo):
     ''' get version from upstream '''
-    click.echo('checking upstream')
     # INCOMPLETE
+    for pkg_name in toleo.cfg:
+        click.echo('package:\t{}'.format(pkg_name))
+        pkg_version = toleo.upstream_version(pkg_name)
+        click.echo('latest:\t\t{}\n'.format(pkg_version))
 
 
 @cli.command()
-def repo():
+@click.pass_obj
+def repo(toleo):
     ''' get version and release from repo '''
     click.echo('checking repo')
     # INCOMPLETE
 
 
 @cli.command()
-def compare():
+@click.pass_obj
+def compare(toleo):
     ''' check if repo version is same as upstream version '''
     click.echo('comparing repo to upstream')
     # INCOMPLETE
