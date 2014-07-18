@@ -164,7 +164,8 @@ class Toleo():
 
 
 @click.command()
-@click.argument('action')
+@click.option('--upstream-only', '-u', 'action', flag_value='upstream')
+@click.option('--repo-only', '-r', 'action', flag_value='repo')
 @click.option('--debug/--no-debug', default=False)
 @click.option('--collection', '-c', default='default')
 @click.option('--path-override', envvar='TOLEO_CONFIG_HOME')
@@ -176,5 +177,5 @@ def cli(action, debug, collection, path_override, limit):
         app.action_upstream()
     elif action == 'repo':
         app.action_repo()
-    elif action == 'compare':
+    else:
         app.action_compare()
