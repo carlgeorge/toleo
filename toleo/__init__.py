@@ -92,12 +92,13 @@ class Toleo():
         result = self.scrape(url, use_headers)
         matches = re.findall(pattern, result)
         if self.verbose > 0:
-            click.echo('url:\t\t{}'.format(url))
             click.echo('parser:\t\t{}'.format(parser))
+            click.echo('url:\t\t{}'.format(url))
             click.echo('use_headers:\t{}'.format(use_headers))
+            click.echo('pattern:\t{}'.format(pattern))
             click.echo('matches:\t{}'.format(matches))
             if self.verbose > 1:
-                click.echo('result:\t{}'.format(result))
+                click.echo('result:\t\t{}'.format(result))
         version = ''
         for match in matches:
             if self.ver_compare(match, version, ignore_release=True) == 'gt':
@@ -120,13 +121,13 @@ class Toleo():
             pattern = repo.get('pattern')
             matches = re.findall(pattern, result)
             if self.verbose > 0:
-                click.echo('url:\t\t{}'.format(url))
                 click.echo('parser:\t\t{}'.format(parser))
+                click.echo('url:\t\t{}'.format(url))
                 click.echo('use_headers:\t{}'.format(use_headers))
                 click.echo('pattern:\t{}'.format(pattern))
                 click.echo('matches:\t{}'.format(matches))
                 if self.verbose > 1:
-                    click.echo('result:\t{}'.format(result))
+                    click.echo('result:\t\t{}'.format(result))
             version = ''
             for match in matches:
                 if self.ver_compare(match, version) == 'gt':
