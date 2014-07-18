@@ -139,7 +139,7 @@ class Toleo():
         for pkg_name in self.cfg:
             click.echo('package:\t{}'.format(pkg_name))
             src_version = self.upstream_version(pkg_name)
-            click.echo('upstream:\t{}'.format(src_version.rstrip('-0')))
+            click.echo('upstream:\t{}'.format(src_version))
             click.echo(self.line)
 
     def action_repo(self):
@@ -148,7 +148,7 @@ class Toleo():
         for pkg_name in self.cfg:
             click.echo('package:\t{}'.format(pkg_name))
             pkg_version = self.repo_version(pkg_name)
-            click.echo('repo:\t\t{}'.format(pkg_version.rstrip('-0')))
+            click.echo('repo:\t\t{}'.format(pkg_version))
             click.echo(self.line)
 
     def action_compare(self):
@@ -157,9 +157,9 @@ class Toleo():
         for pkg_name in self.cfg:
             click.echo('package:\t{}'.format(pkg_name))
             src_version = self.upstream_version(pkg_name)
-            click.echo('upstream:\t{}'.format(src_version.rstrip('-0')))
+            click.echo('upstream:\t{}'.format(src_version))
             pkg_version = self.repo_version(pkg_name)
-            click.echo('repo:\t\t{}'.format(pkg_version.rstrip('-0')))
+            click.echo('repo:\t\t{}'.format(pkg_version))
             click.echo(self.line)
 
 
