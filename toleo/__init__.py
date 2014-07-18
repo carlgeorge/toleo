@@ -75,7 +75,7 @@ class Toleo():
         return data.json()
 
     def upstream_version(self, pkg_name):
-        ''' Check the upstream site to find the latest version. '''
+        ''' Return the latest version found upstream. '''
         upstream = self.cfg.get(pkg_name).get('upstream')
         url = upstream.get('url')
         parser = upstream.get('parser')
@@ -108,6 +108,23 @@ class Toleo():
         release = full_version.split('-')[1]
         return version, release
 
+    def action_upstream(self):
+        ''' Print all upstream versions. '''
+        for pkg_name in self.cfg:
+            click.echo('package:\t{}'.format(pkg_name))
+            pkg_version = self.upstream_version(pkg_name)
+            click.echo('latest:\t\t{}\n'.format(pkg_version))
+
+    def action_repo(self):
+        ''' Print all repo versions and releases. '''
+        click.echo('checking repo')
+        # INCOMPLETE
+
+    def action_compare(self):
+        ''' Print report of repo versus upstream. '''
+        click.echo('comparing repo to upstream')
+        # INCOMPLETE
+
 
 @click.command()
 @click.argument('action')
@@ -119,26 +136,8 @@ def cli(action, debug, collection, path_override, limit):
     ''' Entry point for application. '''
     app = Toleo(debug, collection, path_override, limit)
     if action == 'upstream':
-        upstream(app)
+        app.action_upstream()
     elif action == 'repo':
-        repo(app)
+        app.action_repo()
     elif action == 'compare':
-        compare(app)
-
-def upstream(app):
-    ''' Get version from upstream. '''
-    # INCOMPLETE
-    for pkg_name in app.cfg:
-        click.echo('package:\t{}'.format(pkg_name))
-        pkg_version = app.upstream_version(pkg_name)
-        click.echo('latest:\t\t{}\n'.format(pkg_version))
-
-def repo(app):
-    ''' Get version and release from repo. '''
-    click.echo('checking repo')
-    # INCOMPLETE
-
-def compare(app):
-    ''' Check if repo version is same as upstream version. '''
-    click.echo('comparing repo to upstream')
-    # INCOMPLETE
+        app.action_compare()
