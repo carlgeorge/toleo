@@ -108,38 +108,38 @@ class Toleo():
 
 
 
-@click.group()
+@click.command()
+@click.argument('action')
 @click.option('--debug/--no-debug', default=False)
 @click.option('--collection', '-c', default='default')
 @click.option('--path-override', envvar='TOLEO_CONFIG_HOME')
 @click.option('--limit', '-l')
-@click.pass_context
-def cli(ctx, debug, collection, path_override, limit):
+def cli(action, debug, collection, path_override, limit):
     ''' entry point for application '''
-    ctx.obj = Toleo(debug, collection, path_override, limit)
+    app = Toleo(debug, collection, path_override, limit)
+    if action == 'upstream':
+        upstream(app)
+    elif action == 'repo':
+        repo(app)
+    elif action == 'compare':
+        compare(app)
 
-@cli.command()
-@click.pass_obj
-def upstream(toleo):
+def upstream(app):
     ''' get version from upstream '''
     # INCOMPLETE
-    for pkg_name in toleo.cfg:
+    for pkg_name in app.cfg:
         click.echo('package:\t{}'.format(pkg_name))
-        pkg_version = toleo.upstream_version(pkg_name)
+        pkg_version = app.upstream_version(pkg_name)
         click.echo('latest:\t\t{}\n'.format(pkg_version))
 
 
-@cli.command()
-@click.pass_obj
-def repo(toleo):
+def repo(app):
     ''' get version and release from repo '''
     click.echo('checking repo')
     # INCOMPLETE
 
 
-@cli.command()
-@click.pass_obj
-def compare(toleo):
+def compare(app):
     ''' check if repo version is same as upstream version '''
     click.echo('comparing repo to upstream')
     # INCOMPLETE
