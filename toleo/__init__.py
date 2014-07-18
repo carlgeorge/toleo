@@ -21,6 +21,7 @@ class Toleo():
         self.limit = limit
         self.cfg_path = self.find_config()
         self.cfg = self.read_config()
+        self.line = '-' * 50
 
     def find_config(self):
         ''' Return a pathlib object of the desired config file. '''
@@ -96,35 +97,45 @@ class Toleo():
                 version = '{}-0'.format(match)
         return version
 
-    def repo_version_release(self, pkg_name):
-        ''' Find the version and release of a package. '''
+    def repo_version(self, pkg_name):
+        ''' Find the version of a package in a repo. '''
         repo = self.cfg.get(pkg_name).get('repo')
         url = repo.get('url')
         parser = repo.get('parser')
         # need logic to map parser to appropriate method
         data = self.aur_api('info', pkg_name)
         result = data.get('results')
-        full_version = result.get('Version')
-        version = full_version.split('-')[0]
-        release = full_version.split('-')[1]
-        return version, release
+        version = result.get('Version')
+        return version
 
     def action_upstream(self):
         ''' Print all upstream versions. '''
+        click.echo(self.line)
         for pkg_name in self.cfg:
             click.echo('package:\t{}'.format(pkg_name))
-            pkg_version = self.upstream_version(pkg_name)
-            click.echo('latest:\t\t{}\n'.format(pkg_version.rstrip('-0')))
+            src_version = self.upstream_version(pkg_name)
+            click.echo('upstream:\t{}'.format(src_version.rstrip('-0')))
+            click.echo(self.line)
 
     def action_repo(self):
-        ''' Print all repo versions and releases. '''
-        click.echo('checking repo')
-        # INCOMPLETE
+        ''' Print all repo versions. '''
+        click.echo(self.line)
+        for pkg_name in self.cfg:
+            click.echo('package:\t{}'.format(pkg_name))
+            pkg_version = self.repo_version(pkg_name)
+            click.echo('repo:\t\t{}'.format(pkg_version.rstrip('-0')))
+            click.echo(self.line)
 
     def action_compare(self):
         ''' Print report of repo versus upstream. '''
-        click.echo('comparing repo to upstream')
-        # INCOMPLETE
+        click.echo(self.line)
+        for pkg_name in self.cfg:
+            click.echo('package:\t{}'.format(pkg_name))
+            src_version = self.upstream_version(pkg_name)
+            click.echo('upstream:\t{}'.format(src_version.rstrip('-0')))
+            pkg_version = self.repo_version(pkg_name)
+            click.echo('repo:\t\t{}'.format(pkg_version.rstrip('-0')))
+            click.echo(self.line)
 
 
 @click.command()
