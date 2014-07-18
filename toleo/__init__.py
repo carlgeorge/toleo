@@ -85,7 +85,7 @@ class Toleo():
         url = upstream.get('url')
         parser = upstream.get('parser')
         pattern = upstream.get('pattern')
-        use_headers = upstream.get('use_headers')
+        use_headers = upstream.get('use_headers', False)
         result = self.scrape(url, use_headers)
         matches = re.findall(pattern, result)
         if self.debug:
@@ -105,12 +105,30 @@ class Toleo():
         ''' Find the version of a package in a repo. '''
         pkg_data = self.cfg.get(pkg_name)
         repo = pkg_data.get('repo')
-        url = repo.get('url')
         parser = repo.get('parser')
-        # need logic to map parser to appropriate method
-        data = self.aur_api('info', pkg_name)
-        result = data.get('results')
-        version = result.get('Version')
+        if parser == 'aur':
+            data = self.aur_api('info', pkg_name)
+            result = data.get('results')
+            version = result.get('Version')
+        elif parser == 'scrape':
+            url = repo.get('url')
+            use_headers = repo.get('use_headers', False)
+            result = self.scrape(url, use_headers)
+            pattern = repo.get('pattern')
+            matches = re.findall(pattern, result)
+            if self.debug:
+                click.echo('url:\t\t{}'.format(url))
+                click.echo('parser:\t\t{}'.format(parser))
+                click.echo('use_headers:\t{}'.format(use_headers))
+                click.echo('pattern:\t{}'.format(pattern))
+                click.echo('\nresult:\n{}'.format(result))
+                click.echo('matches:\t{}'.format(matches))
+            version = ''
+            for match in matches:
+                if self.ver_compare(match, version) == 'gt':
+                    version = match
+        else:
+            self.abort('unknown parser')
         return version
 
     def action_upstream(self):
