@@ -80,7 +80,8 @@ class Toleo():
 
     def upstream_version(self, pkg_name):
         ''' Return the latest version found upstream. '''
-        upstream = self.cfg.get(pkg_name).get('upstream')
+        pkg_data = self.cfg.get(pkg_name)
+        upstream = pkg_data.get('upstream')
         url = upstream.get('url')
         parser = upstream.get('parser')
         pattern = upstream.get('pattern')
@@ -102,7 +103,8 @@ class Toleo():
 
     def repo_version(self, pkg_name):
         ''' Find the version of a package in a repo. '''
-        repo = self.cfg.get(pkg_name).get('repo')
+        pkg_data = self.cfg.get(pkg_name)
+        repo = pkg_data.get('repo')
         url = repo.get('url')
         parser = repo.get('parser')
         # need logic to map parser to appropriate method
