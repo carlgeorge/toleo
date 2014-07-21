@@ -23,9 +23,8 @@ class Toleo():
         self.cfg = self.read_config()
         self.line = '-' * 50
 
-    def abort(self, msg):
-        formatted_msg = click.style(msg, fg='red', bold=True)
-        sys.exit(formatted_msg)
+    class Error(Exception):
+        pass
 
     def find_config(self):
         ''' Return a pathlib object of the desired config file. '''
@@ -40,8 +39,7 @@ class Toleo():
             with self.cfg_path.open() as f:
                 full_cfg = yaml.load(f)
         else:
-            msg = 'cannot read {}'.format(self.cfg_path)
-            self.abort(msg)
+            raise self.Error('cannot read {}'.format(self.cfg_path))
         if self.limit is None:
             cfg = full_cfg
         else:
@@ -133,7 +131,7 @@ class Toleo():
                 if self.ver_compare(match, version) == 'gt':
                     version = match
         else:
-            self.abort('unknown parser')
+            raise self.Error('unknown parser')
         return version
 
     def action_upstream(self):
