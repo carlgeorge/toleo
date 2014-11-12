@@ -11,8 +11,6 @@ class Package():
     def __init__(self, name, **kwargs):
         self.name = name
         self.upstream = kwargs.get('upstream') or self.name
-        self.repo = kwargs.get('repo')
-        self.arch = kwargs.get('arch')
         self.version = self.get_version()
 
     def __str__(self):
@@ -39,23 +37,26 @@ class ArchPackage(Package):
     Package object for packages in the offical Arch Repositories.
     '''
     def get_version(self):
-        if self.repo is None:
-            raise TypeError('missing required keyword argument: repo')
-        if self.repo not in ['core', 'extra', 'community',
-                             'multilib', 'testing']:
-            raise TypeError('invalid repo')
-        if self.arch is None:
-            self.arch = 'x86_64'
-        self.url = '/'.join(['https://www.archlinux.org/packages',
-                             self.repo, self.arch, self.name, 'json'])
-        print(self.url)
-        response = requests.get(self.url, timeout=3)
-        print(response.text)
-        if response.ok:
-            data = response.json()
-            epoch = data.get('epoch')
-            pkgver = data.get('pkgver')
-            pkgrel = data.get('pkgrel')
-            return Version('{}:{}-{}'.format(epoch, pkgver, pkgrel))
+        search = 'https://www.archlinux.org/packages/search/json'
+        params = {'name': self.name}
+        response = requests.get(search, params=params, timeout=3)
+        results = response.json().get('results')
+        if len(results) > 0:
+            self.arches = []
+            for result in results:
+                self.arches.append(result.get('arch'))
+                self.epoch = result.get('epoch')
+                self.pkgver = result.get('pkgver')
+                self.pkgrel = result.get('pkgrel')
+                self.repo = result.get('repo')
+            if 'x86_64' in self.arches:
+                display_arch = 'x86_64'
+            else:
+                display_arch = self.arches[0]
+            self.url = '/'.join(['https://www.archlinux.org/packages',
+                                 self.repo,
+                                 display_arch,
+                                 self.name])
+            return Version('{}:{}-{}'.format(self.epoch, self.pkgver, self.pkgrel))
         else:
-            raise LookupError(self.name + ' not found in ' + self.repo)
+            raise LookupError(self.name + ' not found')
