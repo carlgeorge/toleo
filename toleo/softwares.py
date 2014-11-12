@@ -1,3 +1,4 @@
+import requests
 from .misc import Version
 
 
