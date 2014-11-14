@@ -68,9 +68,8 @@ class PypiSoftware(Software):
         url  (default: https://pypi.python.org/pypi/name/json)
     '''
     def get_version(self):
-        if self.url is None:
-            self.url = '/'.join(['https://pypi.python.org/pypi',
-                                 self.name, 'json'])
+        self.url = '/'.join(['https://pypi.python.org/pypi',
+                             self.name, 'json'])
         response = requests.get(self.url, timeout=3)
         releases = response.json().get('releases').keys()
         versions = [Version(release) for release in releases]
