@@ -64,8 +64,6 @@ class PypiSoftware(Software):
 
     Required arguments:
         name
-    Optional keyword arguments:
-        url  (default: https://pypi.python.org/pypi/name/json)
     '''
     def get_version(self):
         self.url = '/'.join(['https://pypi.python.org/pypi',
