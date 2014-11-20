@@ -1,3 +1,4 @@
+import json
 import re
 import requests
 from .misc import Version
