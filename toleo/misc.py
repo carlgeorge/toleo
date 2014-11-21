@@ -2,15 +2,6 @@ import re
 import pkg_resources
 
 
-class Url():
-    def __init__(self, url):
-        self.url = url
-    def __str__(self):
-        return self.url
-    def __truediv__(self, other):
-        return self.__class__('/'.join([self.url.rstrip('/'), str(other)]))
-
-
 class Version():
     '''
     Version object that provides accurate comparison methods.  Comparison
