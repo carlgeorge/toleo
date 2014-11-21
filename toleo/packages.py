@@ -2,6 +2,11 @@ import json
 import requests
 from .misc import Version
 
+import bs4
+import gzip
+import io
+import requests
+
 
 class Package():
     '''
@@ -10,6 +15,7 @@ class Package():
     '''
     def __init__(self, name, **kwargs):
         self.name = name
+        self.url = kwargs.get('url')
         self.upstream = kwargs.get('upstream') or self.name
         self.version = self.get_version()
 
@@ -60,3 +66,38 @@ class ArchPackage(Package):
             return Version('{}:{}-{}'.format(self.epoch, self.pkgver, self.pkgrel))
         else:
             raise LookupError(self.name + ' not found')
+
+
+class YumPackage(Package):
+    def get_version(self):
+        if self.url is None:
+            raise TypeError('missing required keyword argument: url')
+        self.url = self.url.rstrip('/')
+        self.repomd = self.get_repomd()
+        self.versioninfo = self.get_versioninfo()
+        self.epoch = self.versioninfo.get('epoch')
+        self.pkgver = self.versioninfo.get('ver')
+        self.pkgrel = self.versioninfo.get('rel')
+        return Version('{}:{}-{}'.format(self.epoch,
+                                         self.pkgver,
+                                         self.pkgrel))
+
+    def get_repomd(self):
+        path = '/'.join([self.url, 'repodata', 'repomd.xml'])
+        response = requests.get(path, timeout=3)
+        if not response.ok:
+            raise LookupError(response.reason)
+        return bs4.BeautifulSoup(response.content, 'xml')
+
+    def get_versioninfo(self):
+        primary = self.repomd.find(type='primary').location['href']
+        path = '/'.join([self.url, primary])
+        response = requests.get(path, timeout=3)
+        if not response.ok:
+            raise LookupError(response.reason)
+        gzfo = io.BytesIO(response.content)
+        data = gzip.GzipFile(fileobj=gzfo)
+        soup = bs4.BeautifulSoup(data.read(), 'xml')
+        gzfo.close()
+        data.close()
+        return soup.find('name', text=self.name).parent.version.attrs
