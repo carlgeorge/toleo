@@ -1,5 +1,6 @@
 from .softwares import GenericSoftware, PypiSoftware, GithubSoftware, BitbucketSoftware
 from .packages import AurPackage, ArchPackage
+from .processing import process
 
 
 __all__ = [
@@ -8,5 +9,6 @@ __all__ = [
     'GithubSoftware',
     'BitbucketSoftware',
     'AurPackage',
-    'ArchPackage'
+    'ArchPackage',
+    'process'
 ]
