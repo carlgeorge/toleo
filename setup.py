@@ -14,5 +14,6 @@ setuptools.setup(
     author_email='carl@cgtx.us',
     url='https://github.com/cgtx/toleo',
     packages=['toleo'],
-    install_requires=['requests', 'setuptools', 'beautifulsoup4', 'PyYAML']
+    install_requires=['requests', 'setuptools', 'beautifulsoup4', 'PyYAML'],
+    classifiers=[ 'Programming Language :: Python :: 3.4' ]
 )
