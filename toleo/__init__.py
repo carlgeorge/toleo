@@ -1,7 +1,6 @@
-from .softwares import GenericSoftware, PypiSoftware, GithubSoftware, BitbucketSoftware
-from .packages import AurPackage, ArchPackage
-from .config import load_collection
-from .processing import process
+from .types import GenericSoftware, PypiSoftware, GithubSoftware, \
+    BitbucketSoftware, AurPackage, ArchPackage, YumPackage
+from .utils import load_collection, process
 
 
 __all__ = [
@@ -11,6 +10,7 @@ __all__ = [
     'BitbucketSoftware',
     'AurPackage',
     'ArchPackage',
+    'YumPackage',
     'load_collection',
     'process'
 ]

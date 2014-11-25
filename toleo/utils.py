@@ -1,6 +1,15 @@
 import multiprocessing
-from .softwares import GenericSoftware, PypiSoftware, GithubSoftware, BitbucketSoftware
-from .packages import AurPackage, ArchPackage
+import yaml
+from .types import GenericSoftware, PypiSoftware, GithubSoftware, \
+    BitbucketSoftware, AurPackage, ArchPackage, YumPackage
+
+
+def load_collection(config):
+    if config.is_file():
+        with config.open() as f:
+            return yaml.load(f)
+    else:
+        raise FileNotFoundError('cannot read {}'.format(config))
 
 
 def worker(item):
