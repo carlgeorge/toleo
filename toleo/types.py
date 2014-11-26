@@ -5,6 +5,33 @@ import json
 import pkg_resources
 import re
 import requests
+import yaml
+
+
+class Collection():
+    '''
+    Object corresponding to a collection of packages.  A collection is defined
+    in a yaml config file.
+
+    Example config:
+        repo:
+          package1:
+            source: pypi
+          package2:
+            source: http://example.com/downloads/
+
+    Required arguments:
+        config      A pathlib Path object of a valid config file.
+    '''
+    def __init__(self, config):
+        self.name = config.stem
+        with config.open() as f:
+            data = yaml.load(f)
+        if len(data) == 1:
+            self.repo, pkgdata = list(data.items())[0]
+        else:
+            raise AttributeError('invalid collection config for ' + self.name)
+        self.packages = [(self.repo,) + i for i in pkgdata.items()]
 
 
 class Version():
