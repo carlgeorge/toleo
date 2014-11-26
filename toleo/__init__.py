@@ -1,6 +1,6 @@
 from .types import GenericSoftware, PypiSoftware, GithubSoftware, \
     BitbucketSoftware, AurPackage, ArchPackage, YumPackage, Collection
-from .utils import load_collection, process
+from .utils import process
 
 
 __all__ = [
@@ -12,6 +12,5 @@ __all__ = [
     'ArchPackage',
     'YumPackage',
     'Collection',
-    'load_collection',
     'process'
 ]
