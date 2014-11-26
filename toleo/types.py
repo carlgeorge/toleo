@@ -30,7 +30,8 @@ class Collection():
         if len(data) == 1:
             self.repo, pkgdata = list(data.items())[0]
         else:
-            raise AttributeError('invalid collection config for ' + self.name)
+            msg = 'invalid config for collection "{}"'
+            raise AttributeError(msg.format(self.name))
         self.packages = [(self.repo,) + i for i in pkgdata.items()]
 
 
