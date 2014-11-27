@@ -74,7 +74,10 @@ class Version():
         self.pure = self.epoch == '0' and self.release == '0'
 
     def __str__(self):
-        return self.orig
+        if self.pure:
+            return self.version
+        else:
+            return self.evr
 
     def parse(self, version_string):
         return pkg_resources.parse_version(version_string)
