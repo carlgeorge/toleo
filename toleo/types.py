@@ -6,6 +6,23 @@ import pkg_resources
 import re
 import requests
 import yaml
+from .exceptions import ToleoException
+
+
+def get(*args, **kwargs):
+    kwargs['timeout'] = 3
+    try:
+        return requests.get(*args, **kwargs)
+    except requests.exceptions.ReadTimeout as e:
+        raise ToleoException(e.request.url, error='ToleoTimeout')
+
+
+def head(*args, **kwargs):
+    kwargs['timeout'] = 3
+    try:
+        return requests.head(*args, **kwargs)
+    except requests.exceptions.ReadTimeout as e:
+        raise ToleoException(e.request.url, error='ToleoTimeout')
 
 
 class Collection():
@@ -25,13 +42,20 @@ class Collection():
     '''
     def __init__(self, config):
         self.name = config.stem
-        with config.open() as f:
-            data = yaml.load(f)
+        try:
+            with config.open() as f:
+                data = yaml.load(f)
+        except OSError:
+            msg = 'cannot read file for collection "{}"'
+            raise ToleoException(msg.format(self.name), error='ConfigError')
+        except yaml.scanner.ScannerError:
+            msg = 'invalid yaml in collection "{}"'
+            raise ToleoException(msg.format(self.name), error='ConfigError')
         if len(data) == 1:
             self.repo, pkgdata = list(data.items())[0]
         else:
-            msg = 'invalid config for collection "{}"'
-            raise AttributeError(msg.format(self.name))
+            msg = 'more than one repo specified in collection "{}"'
+            raise ToleoException(msg.format(self.name), error='ConfigError')
         self.packages = [(self.repo,) + i for i in pkgdata.items()]
 
 
@@ -165,10 +189,10 @@ class GenericSoftware(Software):
             self.pattern = \
                 r'(?:{}[-_])?([\d.]+).(?:tar.gz|tgz)'.format(self.name)
         if self.use_headers:
-            headers = requests.head(self.url).headers
+            headers = head(self.url).headers
             result = json.dumps(dict(headers))
         else:
-            result = requests.get(self.url, timeout=3).text
+            result = get(self.url).text
         matches = set(re.findall(self.pattern, result))
         versions = [Version(match) for match in matches]
         return self.get_latest(versions)
@@ -184,7 +208,7 @@ class PypiSoftware(Software):
     def get_version(self):
         self.url = '/'.join(['https://pypi.python.org/pypi',
                              self.name, 'json'])
-        response = requests.get(self.url, timeout=3)
+        response = get(self.url)
         releases = response.json().get('releases').keys()
         versions = [Version(release) for release in releases]
         return self.get_latest(versions)
@@ -208,7 +232,7 @@ class GithubSoftware(Software):
             self.tag_trims = []
         self.url = '/'.join(['https://api.github.com/repos',
                              self.owner, self.name, 'tags'])
-        response = requests.get(self.url, timeout=3)
+        response = get(self.url)
         if response.ok:
             tags = [release['name'] for release in response.json()]
             versions = [Version(self.trim(tag)) for tag in tags]
@@ -240,7 +264,7 @@ class BitbucketSoftware(Software):
             self.tag_trims = []
         self.url = '/'.join(['https://bitbucket.org/api/1.0/repositories',
                              self.owner, self.name, 'tags'])
-        response = requests.get(self.url, timeout=3)
+        response = get(self.url)
         if response.ok:
             tags = response.json().keys()
             versions = [Version(self.trim(tag)) for tag in tags]
@@ -274,9 +298,8 @@ class AurPackage(Package):
     Package object for packages in the Arch User Repository (AUR).
     '''
     def get_version(self):
-        response = requests.get('https://aur.archlinux.org/rpc.php',
-                                params={'type': 'info', 'arg': self.name},
-                                timeout=3)
+        response = get('https://aur.archlinux.org/rpc.php',
+                       params={'type': 'info', 'arg': self.name})
         if response.json().get('resultcount') == 1:
             version_string = response.json().get('results').get('Version')
             return Version(version_string)
@@ -291,7 +314,7 @@ class ArchPackage(Package):
     def get_version(self):
         search = 'https://www.archlinux.org/packages/search/json'
         params = {'name': self.name}
-        response = requests.get(search, params=params, timeout=3)
+        response = get(search, params=params)
         results = response.json().get('results')
         if len(results) > 0:
             self.arches = []
@@ -332,7 +355,7 @@ class YumPackage(Package):
 
     def get_repomd(self):
         path = '/'.join([self.url, 'repodata', 'repomd.xml'])
-        response = requests.get(path, timeout=3)
+        response = get(path)
         if not response.ok:
             raise LookupError(response.reason)
         return bs4.BeautifulSoup(response.content, 'xml')
@@ -340,7 +363,7 @@ class YumPackage(Package):
     def get_versioninfo(self):
         primary = self.repomd.find(type='primary').location['href']
         path = '/'.join([self.url, primary])
-        response = requests.get(path, timeout=3)
+        response = get(path)
         if not response.ok:
             raise LookupError(response.reason)
         gzfo = io.BytesIO(response.content)

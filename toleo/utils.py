@@ -1,4 +1,5 @@
 import multiprocessing
+from .exceptions import ToleoException
 from .types import GenericSoftware, PypiSoftware, GithubSoftware, \
     BitbucketSoftware, AurPackage, ArchPackage, YumPackage
 
@@ -30,13 +31,14 @@ def worker(package):
         software = BitbucketSoftware(src_name, **src_args)
     else:
         msg = '{}: unknown source type "{}"'
-        raise ValueError(msg.format(pkg_name, src_type))
+        raise ToleoException(msg.format(pkg_name, src_type),
+                             error='ConfigError')
 
     # create package object
     if repo == 'aur':
         package = AurPackage(pkg_name)
     else:
-        msg = '{}: unknown repo "{}"'
-        raise ValueError(msg.format(pkg_name, repo))
+        msg = 'unknown repo "{}"'
+        raise ToleoException(msg.format(repo), error='ConfigError')
 
     return (software, package)
