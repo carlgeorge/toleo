@@ -51,6 +51,9 @@ class Collection():
         except yaml.scanner.ScannerError:
             msg = 'invalid yaml in collection "{}"'
             raise ToleoException(msg.format(self.name), error='ConfigError')
+        if data == None:
+            msg = 'empty file for collection "{}"'
+            raise ToleoException(msg.format(self.name), error='ConfigError')
         if len(data) == 1:
             self.repo, pkgdata = list(data.items())[0]
         else:
