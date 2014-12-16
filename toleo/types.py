@@ -46,20 +46,22 @@ class Collection():
             with config.open() as f:
                 data = yaml.load(f)
         except OSError:
-            msg = 'cannot read file for collection "{}"'
-            raise ToleoException(msg.format(self.name), error='ConfigError')
-        except yaml.scanner.ScannerError:
-            msg = 'invalid yaml in collection "{}"'
-            raise ToleoException(msg.format(self.name), error='ConfigError')
+            self.abort('cannot read file for collection "{}"')
+        except yaml.YAMLError:
+            self.abort('invalid yaml in collection "{}"')
         if data == None:
-            msg = 'empty file for collection "{}"'
-            raise ToleoException(msg.format(self.name), error='ConfigError')
-        if len(data) == 1:
+            self.abort('empty file for collection "{}"')
+        if len(data) > 1:
+            self.abort('more than one repo specified in collection "{}"')
+        try:
             self.repo, pkgdata = list(data.items())[0]
-        else:
-            msg = 'more than one repo specified in collection "{}"'
-            raise ToleoException(msg.format(self.name), error='ConfigError')
-        self.packages = [(self.repo,) + i for i in pkgdata.items()]
+            self.packages = [(self.repo,) + i for i in pkgdata.items()]
+        except Exception:
+            self.abort('invalid config for collection "{}"')
+
+    def abort(self, msg):
+        raise ToleoException(msg.format(self.name), error='ConfigError')
+
 
 
 class Version():
