@@ -4,7 +4,9 @@ from .types import GenericSoftware, PypiSoftware, GithubSoftware, \
     BitbucketSoftware, AurPackage, ArchPackage, YumPackage
 
 
-def process(collection):
+def process(collection, cache_dir):
+    if not cache_dir.is_dir():
+        cache_dir.mkdir()
     pool = multiprocessing.Pool()
     results = pool.map(worker, collection.packages)
     pool.close()
