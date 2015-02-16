@@ -184,15 +184,16 @@ class GenericSoftware(Software):
     Required keyword arguments:
         url
     Optional keyword arguments:
-        pattern  (default: (?:name[-_])?([\d.]+).(?:tar.gz|tgz)
+        pattern  (default: (?:name[-_])?([\d.]+).(?:tar.gz|tgz|tar.xz|txz|zip))
         use_headers  (default: False)
     '''
     def get_version(self):
         if self.url is None:
             raise TypeError('missing required keyword argument: url')
         if self.pattern is None:
-            self.pattern = \
-                r'(?:{}[-_])?([\d.]+).(?:tar.gz|tgz)'.format(self.name)
+            self.pattern = ('(?:{}[-_])?'
+                            '([\d.]+).'
+                            '(?:tar.gz|tgz|tar.xz|txz|zip)').format(self.name)
         if self.use_headers:
             headers = head(self.url).headers
             result = json.dumps(dict(headers))
