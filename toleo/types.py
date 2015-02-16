@@ -184,8 +184,8 @@ class GenericSoftware(Software):
     Required keyword arguments:
         url
     Optional keyword arguments:
-        pattern  (default: (?:name[-_])?([\d.]+).(?:tar.gz|tgz|tar.xz|txz|zip))
-        use_headers  (default: False)
+        pattern  [default: (?:name[-_])?([\d.]+).(?:tar.gz|tgz|tar.xz|txz|zip)]
+        use_headers  [default: False]
     '''
     def get_version(self):
         if self.url is None:
@@ -229,7 +229,7 @@ class GithubSoftware(Software):
     Required keyword arguments:
         owner
     Optional keyword arguments:
-        tag_trims (default: empty list)
+        tag_trims [default: empty list]
     '''
     def get_version(self):
         if self.owner is None:
@@ -261,7 +261,7 @@ class BitbucketSoftware(Software):
     Required keyword arguments:
         owner
     Optional keyword arguments:
-        tag_trims (default: empty list)
+        tag_trims [default: empty list]
     '''
     def get_version(self):
         if self.owner is None:
