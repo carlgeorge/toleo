@@ -8,12 +8,12 @@ if not sys.version_info >= (3, 4):
 
 setuptools.setup(
     name='toleo',
-    version='0.0.2',
+    version='0.1',
     description='Library for tracking software and package versions.',
     author='Carl George',
     author_email='carl@cgtx.us',
-    url='https://github.com/cgtx/toleo',
+    url='https://github.com/carlgeorge/toleo',
     packages=['toleo'],
-    install_requires=['requests', 'setuptools', 'beautifulsoup4', 'PyYAML'],
+    install_requires=['aiohttp', 'pyalpm', 'PyYAML'],
     classifiers=[ 'Programming Language :: Python :: 3.4' ]
 )

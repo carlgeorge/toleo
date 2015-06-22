@@ -1,14 +1,10 @@
-import sys
+class ToleoError(Exception):
+    pass
 
 
-class ToleoException(Exception):
-    '''
-    Base exception class.
-    '''
-    def __init__(self, message, error=None):
-        super().__init__(message)
-        self.message = message
-        self.error = error or 'ToleoException'
+class NotFoundError(ToleoError):
+    pass
 
-    def quit(self):
-        sys.exit('{}: {}'.format(self.error, self.message))
+
+class ApiError(ToleoError):
+    pass
