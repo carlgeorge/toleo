@@ -31,7 +31,7 @@ class AurPackage(Package):
         self.name = name
         self.url = '/'.join([self._aur, 'packages', name])
 
-    @asyncio.coroutine 
+    @asyncio.coroutine
     def _load(self):
         api = '{}/rpc.php'.format(self._aur)
         payload = {'type': 'info', 'arg': self.name}
