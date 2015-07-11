@@ -8,3 +8,7 @@ class NotFoundError(ToleoError):
 
 class ApiError(ToleoError):
     pass
+
+
+class ConfigError(ToleoError):
+    pass
