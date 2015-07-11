@@ -11,7 +11,7 @@ setuptools.setup(
     version='0.1',
     description='Library for tracking software and package versions.',
     author='Carl George',
-    author_email='carl@cgtx.us',
+    author_email='dev@cgtx.us',
     url='https://github.com/carlgeorge/toleo',
     packages=['toleo'],
     install_requires=['aiohttp', 'pyalpm', 'PyYAML'],
