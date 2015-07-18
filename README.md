@@ -1,4 +1,3 @@
-toleo
-=====
+# toleo
 
-track software versions
+A library for comparing upstream and downstream software versions.
